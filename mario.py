@@ -36,7 +36,7 @@ while True:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 if standing == True:
-                    jumpercounter = 15
+                    jumpercounter = 25
     
     #movement detections
     keys = pygame.key.get_pressed()
@@ -46,7 +46,7 @@ while True:
         if standing == True:
             px += 5
         if standing == False:
-            px += 2
+            px += 4
     if keys[pygame.K_a]:
         mario = pygame.image.load("mariobutleft.png").convert_alpha()
         mario = pygame.transform.scale(mario, (48, 48))
@@ -69,14 +69,14 @@ while True:
 
     #Jumping logic
     if jumpercounter > 0:
-        py -= 14
+        py -= 16
         jumpercounter -= 1
 
     #gravity + if on ground
     if py > 335:
         standing = True
     else:
-        py +=4
+        py += 8
         standing = False
 
     # Update display and tick clock
