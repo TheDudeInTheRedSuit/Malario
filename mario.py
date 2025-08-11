@@ -22,6 +22,7 @@ clock = pygame.time.Clock()
 #player variables
 px = 200
 py = 336
+accelcounter = 0
 standing = False
 jumpercounter = 0
 
@@ -44,16 +45,40 @@ while True:
         mario = pygame.image.load("mario.png").convert_alpha()
         mario = pygame.transform.scale(mario, (48, 48))
         if standing == True:
-            px += 5
-        if standing == False:
-            px += 4
-    if keys[pygame.K_a]:
+            accelcounter += 1
+            if accelcounter > 50:
+                accelcounter = 50
+
+            px += accelcounter // 10
+            
+        elif standing == False:
+            if accelcounter > 50:
+                accelcounter = 50
+
+            px += accelcounter // 10
+            px -= 2
+        
+
+    elif keys[pygame.K_a]:
         mario = pygame.image.load("mariobutleft.png").convert_alpha()
         mario = pygame.transform.scale(mario, (48, 48))
+
         if standing == True:
-            px -= 5
+            accelcounter += 1
+            if accelcounter > 50:
+                accelcounter = 50
+
+            px -= accelcounter // 10
+
         if standing == False:
-            px -= 2
+            if accelcounter > 50:
+                accelcounter = 50
+
+            px -= accelcounter // 10
+            px += 2
+
+    else: 
+        accelcounter = 0
 
     #make background Blue
     screen.fill((135, 206, 235))
