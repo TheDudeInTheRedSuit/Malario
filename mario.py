@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 # Initialize Pygame
 pygame.init()
@@ -22,13 +23,59 @@ clock = pygame.time.Clock()
 #player variables
 px = 200
 py = 336
-accelcounter = 0
+accelcounter = 1
 standing = False
 jumpercounter = 0
+mx = 0
+mvleft = False
+mvright = False
+
+def movecalcX():
+    global accelcounter, mvleft, mvright, mx, mario
+    if accelcounter > 510:
+        accelcounter = 505
+    mxmulti = 1
+    mx = int(501 * (1 - math.exp(-0.05 * accelcounter)))
+    mx = int(mx / 100)
+    
+    
+    if mvleft == True:
+        mxmulti = -1
+        mario = pygame.image.load("mariobutleft.png").convert_alpha()
+        mario = pygame.transform.scale(mario, (48, 48))
+        
+    elif mvright == True:
+        mxmulti = 1
+        mario = pygame.image.load("mario.png").convert_alpha()
+        mario = pygame.transform.scale(mario, (48, 48))
+        
+    return mx * mxmulti
+
+def movecalcY():
+    global standing, jumpercounter
+    my = 0
+
+    if jumpercounter > 0:
+        my -= 16
+        jumpercounter -= 1
+    
+    if py > 335:
+        standing = True
+    else:
+        my += 8
+        standing = False
+    return my
+
+def playermove(MvAmX, MvAmY):
+    global px, py
+    px += MvAmX
+    py += MvAmY
+    screen.blit(mario, (px, py))
+
+
 
 while True:
-
-    #events
+#events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
@@ -42,43 +89,28 @@ while True:
     #movement detections
     keys = pygame.key.get_pressed()
     if keys[pygame.K_d]:
-        mario = pygame.image.load("mario.png").convert_alpha()
-        mario = pygame.transform.scale(mario, (48, 48))
+        
         if standing == True:
             accelcounter += 1
-            if accelcounter > 50:
-                accelcounter = 50
-
-            px += accelcounter // 10
-            
-        elif standing == False:
-            if accelcounter > 50:
-                accelcounter = 50
-
-            px += accelcounter // 10
-            px -= 2
         
+        mvleft = False
+        mvright = True
 
     elif keys[pygame.K_a]:
-        mario = pygame.image.load("mariobutleft.png").convert_alpha()
-        mario = pygame.transform.scale(mario, (48, 48))
 
         if standing == True:
             accelcounter += 1
-            if accelcounter > 50:
-                accelcounter = 50
 
-            px -= accelcounter // 10
-
-        if standing == False:
-            if accelcounter > 50:
-                accelcounter = 50
-
-            px -= accelcounter // 10
-            px += 2
-
+        mvleft = True
+        mvright = False
+        
     else: 
-        accelcounter = 0
+        if accelcounter > 0:
+            if mvleft == True or mvright == True:
+                accelcounter -= 2
+        else:
+            mvleft = False
+            mvright = False
 
     #make background Blue
     screen.fill((135, 206, 235))
@@ -89,21 +121,9 @@ while True:
         screen.blit(ground, (y, 384))
         y += 128
     
-    #draw player
-    screen.blit(mario, (px, py))
+    playermove(movecalcX(), movecalcY())
 
-    #Jumping logic
-    if jumpercounter > 0:
-        py -= 16
-        jumpercounter -= 1
-
-    #gravity + if on ground
-    if py > 335:
-        standing = True
-    else:
-        py += 8
-        standing = False
-
+    
     # Update display and tick clock
     pygame.display.flip()
     clock.tick(60)
