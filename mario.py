@@ -32,11 +32,11 @@ mvright = False
 
 def movecalcX():
     global accelcounter, mvleft, mvright, mx, mario
-    if accelcounter > 510:
-        accelcounter = 505
+    if accelcounter > 55:
+        accelcounter = 55
     mxmulti = 1
-    mx = int(501 * (1 - math.exp(-0.05 * accelcounter)))
-    mx = int(mx / 100)
+    mx = int(51 * (1 - math.exp(-0.05 * accelcounter)))
+    mx = int(mx / 10)
     
     
     if mvleft == True:
@@ -107,7 +107,7 @@ while True:
     else: 
         if accelcounter > 0:
             if mvleft == True or mvright == True:
-                accelcounter -= 2
+                accelcounter -= 5
         else:
             mvleft = False
             mvright = False
