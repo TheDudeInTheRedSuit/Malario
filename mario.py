@@ -35,11 +35,14 @@ def movecalcX():
     if accelcounter > 55:
         accelcounter = 55
     mxmulti = 1
-    mx = int(51 * (1 - math.exp(-0.05 * accelcounter)))
+    mx = int(51 * (1 - math.exp(-0.02 * accelcounter)))
     mx = int(mx / 10)
     
-    
-    if mvleft == True:
+    if mvleft == False and mvright == False:
+        mxmulti = 0
+        accelcounter = 0
+
+    elif mvleft == True:
         mxmulti = -1
         mario = pygame.image.load("mariobutleft.png").convert_alpha()
         mario = pygame.transform.scale(mario, (48, 48))
@@ -71,6 +74,7 @@ def playermove(MvAmX, MvAmY):
     px += MvAmX
     py += MvAmY
     screen.blit(mario, (px, py))
+    
 
 def rectload():
     print('dummy to prevent errors')
@@ -80,7 +84,7 @@ def mapload():
 
 def collidetect():
     print('dummy to prevent errors')
-    
+
 while True:
 #events
     for event in pygame.event.get():
@@ -95,7 +99,14 @@ while True:
     
     #movement detections
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_d]:
+    if keys[pygame.K_a] and keys[pygame.K_d]:
+        if standing == True:
+            accelcounter += 1
+        
+        mvleft = False
+        mvright = False
+
+    elif keys[pygame.K_d]:
         
         if standing == True:
             accelcounter += 1
@@ -118,6 +129,9 @@ while True:
         else:
             mvleft = False
             mvright = False
+        
+        if accelcounter < 0:
+            accelcounter = 0
 
     #make background Blue
     screen.fill((135, 206, 235))
