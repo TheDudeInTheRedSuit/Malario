@@ -72,8 +72,15 @@ def playermove(MvAmX, MvAmY):
     py += MvAmY
     screen.blit(mario, (px, py))
 
+def rectload():
+    print('dummy to prevent errors')
 
+def mapload():
+    print('dummy to prevent errors')
 
+def collidetect():
+    print('dummy to prevent errors')
+    
 while True:
 #events
     for event in pygame.event.get():
