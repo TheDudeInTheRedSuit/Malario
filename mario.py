@@ -23,7 +23,7 @@ clock = pygame.time.Clock()
 #player variables
 px = 200
 py = 336
-accelcounter = 1
+accelcounter = 0
 standing = False
 jumpercounter = 0
 mx = 0
