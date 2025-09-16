@@ -1,6 +1,4 @@
 import pygame
-import random
-import math
 
 # Initialize Pygame
 pygame.init()
@@ -9,6 +7,10 @@ pygame.init()
 WIDTH, HEIGHT = 1024, 512
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("MARIO!")
+
+hitboxcolor = (0,0,160)
+
+playerhitbox = pygame.Rect(0,0,48,48)
 
 #make images into variables
 ground = pygame.image.load("ground.png").convert()
@@ -30,51 +32,53 @@ mx = 0
 mvleft = False
 mvright = False
 
-def movecalcX():
-    global accelcounter, mvleft, mvright, mx, mario
-    if accelcounter > 55:
-        accelcounter = 55
-    mxmulti = 1
-    mx = int(51 * (1 - math.exp(-0.02 * accelcounter)))
-    mx = int(mx / 10)
-    
-    if mvleft == False and mvright == False:
-        mxmulti = 0
-        accelcounter = 0
 
-    elif mvleft == True:
-        mxmulti = -1
-        mario = pygame.image.load("mariobutleft.png").convert_alpha()
-        mario = pygame.transform.scale(mario, (48, 48))
-        
-    elif mvright == True:
+class playermovement():
+    def movecalcX(self):
+        global accelcounter, mvleft, mvright, mx, mario, dt
+
         mxmulti = 1
-        mario = pygame.image.load("mario.png").convert_alpha()
-        mario = pygame.transform.scale(mario, (48, 48))
+        mx = mxmulti * 90 * dt
         
-    return mx * mxmulti
+        if mvleft == False and mvright == False:
+            mxmulti = 0
+            accelcounter = 0
 
-def movecalcY():
-    global standing, jumpercounter
-    my = 0
+        elif mvleft == True:
+            mxmulti = -1
+            mario = pygame.image.load("mariobutleft.png").convert_alpha()
+            mario = pygame.transform.scale(mario, (48, 48))
+            
+        elif mvright == True:
+            mxmulti = 1
+            mario = pygame.image.load("mario.png").convert_alpha()
+            mario = pygame.transform.scale(mario, (48, 48))
+            
+        return mx
 
-    if jumpercounter > 0:
-        my -= 16
-        jumpercounter -= 1
-    
-    if py > 335:
-        standing = True
-    else:
-        my += 8
-        standing = False
-    return my
+    def movecalcY(self):
+        global standing, jumpercounter
+        my = 0
 
-def playermove(MvAmX, MvAmY):
-    global px, py
-    px += MvAmX
-    py += MvAmY
-    screen.blit(mario, (px, py))
-    
+        if jumpercounter > 0:
+            my -= 16
+            jumpercounter -= 1
+        
+        if py > 335:
+            standing = True
+        else:
+            my += 8
+            standing = False
+        return my
+
+    def playermove(self, MvAmX, MvAmY):
+        global px, py, playerhitbox
+        px += MvAmX
+        py += MvAmY
+        # draw rect, (screen) (color) (x,y,width,height)
+        pygame.draw.rect(screen, hitboxcolor, (px, py, 48, 48))
+        playerhitbox = pygame.Rect(px,py,48,48)
+        screen.blit(mario, (px, py))
 
 def rectload():
     print('dummy to prevent errors')
@@ -85,8 +89,10 @@ def mapload():
 def collidetect():
     print('dummy to prevent errors')
 
+pm = playermovement()
 while True:
 #events
+    dt = clock.tick(60) / 1000
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
@@ -100,38 +106,23 @@ while True:
     #movement detections
     keys = pygame.key.get_pressed()
     if keys[pygame.K_a] and keys[pygame.K_d]:
-        if standing == True:
-            accelcounter += 1
         
         mvleft = False
         mvright = False
 
     elif keys[pygame.K_d]:
         
-        if standing == True:
-            accelcounter += 1
-        
         mvleft = False
         mvright = True
 
     elif keys[pygame.K_a]:
 
-        if standing == True:
-            accelcounter += 1
-
         mvleft = True
         mvright = False
         
     else: 
-        if accelcounter > 0:
-            if mvleft == True or mvright == True:
-                accelcounter -= 5
-        else:
-            mvleft = False
-            mvright = False
-        
-        if accelcounter < 0:
-            accelcounter = 0
+        mvleft = False
+        mvright = False
 
     #make background Blue
     screen.fill((135, 206, 235))
@@ -142,7 +133,7 @@ while True:
         screen.blit(ground, (y, 384))
         y += 128
     
-    playermove(movecalcX(), movecalcY())
+    pm.playermove(pm.movecalcX(), pm.movecalcY())
 
     
     # Update display and tick clock
