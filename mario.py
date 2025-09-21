@@ -32,28 +32,28 @@ mx = 0
 mvleft = False
 mvright = False
 
+# Movement values
+vx, vy = 0, 0
+speed = 300        # max speed (px/sec)
+accel = 1200       # acceleration rate (px/sec^2)
+friction = 800     # deceleration when no input
+
+
 
 class playermovement():
     def movecalcX(self):
-        global accelcounter, mvleft, mvright, mx, mario, dt
+        global mvleft, mvright, mx, mario, dt,standing
 
-        mxmulti = 1
-        mx = mxmulti * 90 * dt
-        
-        if mvleft == False and mvright == False:
-            mxmulti = 0
-            accelcounter = 0
-
-        elif mvleft == True:
-            mxmulti = -1
+        if mvleft == True:
             mario = pygame.image.load("mariobutleft.png").convert_alpha()
             mario = pygame.transform.scale(mario, (48, 48))
             
         elif mvright == True:
-            mxmulti = 1
             mario = pygame.image.load("mario.png").convert_alpha()
             mario = pygame.transform.scale(mario, (48, 48))
             
+        mx = vx * dt
+
         return mx
 
     def movecalcY(self):
@@ -76,7 +76,6 @@ class playermovement():
         px += MvAmX
         py += MvAmY
         # draw rect, (screen) (color) (x,y,width,height)
-        pygame.draw.rect(screen, hitboxcolor, (px, py, 48, 48))
         playerhitbox = pygame.Rect(px,py,48,48)
         screen.blit(mario, (px, py))
 
@@ -105,24 +104,37 @@ while True:
     
     #movement detections
     keys = pygame.key.get_pressed()
+    ax = 0
     if keys[pygame.K_a] and keys[pygame.K_d]:
-        
         mvleft = False
         mvright = False
 
     elif keys[pygame.K_d]:
-        
+        ax += accel
         mvleft = False
         mvright = True
 
     elif keys[pygame.K_a]:
-
+        ax -= accel
         mvleft = True
         mvright = False
         
     else: 
         mvleft = False
         mvright = False
+
+    vx += ax * dt
+
+    if ax == 0:
+        if vx > 0:
+            vx -= min(friction * dt, vx)
+        elif vx < 0:
+            vx += min(friction * dt, -vx)
+        if standing == False:
+            vx = 0
+
+    if vx > speed: vx = speed
+    if vx < -speed: vx = -speed
 
     #make background Blue
     screen.fill((135, 206, 235))
