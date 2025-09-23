@@ -130,8 +130,6 @@ while True:
             vx -= min(friction * dt, vx)
         elif vx < 0:
             vx += min(friction * dt, -vx)
-        if standing == False:
-            vx = 0
 
     if vx > speed: vx = speed
     if vx < -speed: vx = -speed
