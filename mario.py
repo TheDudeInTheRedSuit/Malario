@@ -123,6 +123,8 @@ while True:
         mvleft = False
         mvright = False
 
+
+    # capping movement + slow down
     vx += ax * dt
 
     if ax == 0:
@@ -143,6 +145,7 @@ while True:
         screen.blit(ground, (y, 384))
         y += 128
     
+    # move the player
     pm.playermove(pm.movecalcX(), pm.movecalcY())
 
     
